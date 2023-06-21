@@ -1,7 +1,8 @@
 import cv2
 import torch
 from csvwriter import PoseDetector
-from classifypp import Model
+from classifypp import Model, DataHandler
+import mediapipe as mp
 
 class ExercisePredictor:
     def __init__(self, model_path):
@@ -9,22 +10,36 @@ class ExercisePredictor:
         self.model = Model()
         self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
+        self.classes = DataHandler(None, None).get_class_to_label()
         self.results = None
+        self.frames = []
+        self.pred_class = "None"
 
-    def preprocess(self, img):
-        position = self.detector.findPosition(img)
-        flattened_position = []
-        for x, y, z in position[0]:
-            flattened_position.extend([x, y, z])
-        tensor = torch.tensor(flattened_position, dtype=torch.float32)
-        tensor = tensor.unsqueeze(0)
-        return tensor
 
     def predict(self, frame):
-        tensor = self.preprocess(frame)
-        prediction = self.model(tensor)
-        pred_class = prediction.argmax(dim=1)
-        return pred_class
+        landmarks = self.detector.findPosition(frame)
+        # print("predict", end = " ")
+        if landmarks:
+            # Flatten landmarks into a single list
+            flattened_landmarks = [coord for landmark in landmarks for coord in landmark]
+            flattened_landmarks = torch.tensor(flattened_landmarks)
+
+            self.frames.append(flattened_landmarks)
+
+        if len(self.frames) == (batch_size := 32): 
+            batch = torch.stack(self.frames)
+            output = self.model(batch)
+            from collections import Counter
+            most_common = Counter(output.argmax(dim=1).tolist()).most_common(1)[0][0]
+            self.pred_class = [k for k,v in self.classes.items() if v == most_common][0]
+            self.frames = []
+            print(self.pred_class)
+            return self.pred_class
+        else:
+            # wait for the next frame
+            return self.pred_class
+
+        
 
     def print_lm_on_screen(self, img, text = None):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -44,6 +59,8 @@ if __name__ == "__main__":
 
     while cap.isOpened():
         ret, frame = cap.read()
+        if ret == False:
+            break
         pred_class = predictor.predict(frame)
         frame = predictor.print_lm_on_screen(frame, text=pred_class)
         cv2.imshow('Webcam', frame)

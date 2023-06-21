@@ -2,7 +2,7 @@ import cv2
 import csv
 from  mediapipe import solutions
 from os import path, listdir, sep
-
+import mediapipe as mp
 root_dir = path.dirname(path.abspath(__file__))
 
 class PoseDetector:
@@ -21,7 +21,7 @@ class PoseDetector:
                     cx, cy, cz = int(lm.x * w), int(lm.y * h), lm.z
                 else:
                     cx, cy, cz = lm.x, lm.y, lm.z
-                lmList.append([id, cx, cy, cz])
+                lmList.append([cx, cy, cz])
         return lmList
 
 def write_csv(position, file_name= "t", print_lm_name=True):
@@ -29,11 +29,11 @@ def write_csv(position, file_name= "t", print_lm_name=True):
     with open(file, "a", newline="") as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=",")
         flattened_position = []
-        for id, x, y, z in position[0]:
-            if print_lm_name:
-                landmark_name = solutions.pose.PoseLandmark(id).name
-            else:
-                landmark_name = id
+        for x, y, z in position[0]:
+            # if print_lm_name:
+            #     landmark_name = solutions.pose.PoseLandmark(id).name
+            # else:
+            #     landmark_name = id
             flattened_position.extend([x, y, z])
             
 

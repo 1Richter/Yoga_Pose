@@ -23,6 +23,10 @@ class DataHandler:
         self.batch_size = batch_size
         self.class_to_label = {'downdog': 0, 'warrior2': 1, 'goddess': 2, 'tree': 3, 'plank': 4}
 
+    # get class_to_label dictionary
+    def get_class_to_label(self):
+        return self.class_to_label
+
     def load_data(self, folder):
         datasets = {}
         all_data = []
