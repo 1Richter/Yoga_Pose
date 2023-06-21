@@ -24,6 +24,7 @@ class DataHandler:
         self.class_to_label = {'downdog': 0, 'warrior2': 1, 'goddess': 2, 'tree': 3, 'plank': 4}
 
     # get class_to_label dictionary
+    # @property
     def get_class_to_label(self):
         return self.class_to_label
 
