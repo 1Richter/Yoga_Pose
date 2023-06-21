@@ -1,0 +1,8 @@
+#all except
+*
+!.gitignore
+!classify++.py
+!csvwriter.py
+!README.md
+!test_mdl.py
+!model.pt
