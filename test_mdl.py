@@ -10,7 +10,7 @@ class ExercisePredictor:
         self.model = Model()
         self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
-        self.classes = DataHandler(None, None).get_class_to_label()
+        self.classes = DataHandler(None, None).class_to_label
         self.results = None
         self.frames = []
         self.pred_class = "None"
