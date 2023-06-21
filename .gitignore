@@ -1,7 +1,7 @@
 #all except
 *
 !.gitignore
-!classify++.py
+!classifypp.py
 !csvwriter.py
 !README.md
 !test_mdl.py
