@@ -8,3 +8,5 @@
 !model.pt
 !LICENSE.md
 !requirements.txt
+!images/
+!images/**
